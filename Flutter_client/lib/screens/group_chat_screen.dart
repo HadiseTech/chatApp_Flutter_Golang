@@ -1,17 +1,24 @@
+import 'package:chat_app/models/group_model.dart';
 import 'package:chat_app/models/message_model.dart';
 import 'package:chat_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 
-class ChatScreen extends StatefulWidget {
-  final User user;
-
-  const ChatScreen({this.user});
-
+class GroupChat extends StatefulWidget {
+  final Group group;
+  GroupChat({this.group});
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _GroupChatState createState() => _GroupChatState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _GroupChatState extends State<GroupChat> {
+  List<Message> messages;
+  @override
+  void initState() {
+    // TODO: implement initState
+    messages = widget.group.id == 0 ? messages_group_one : messages_group_two;
+    super.initState();
+  }
+
   final fieldText = TextEditingController();
 
   void clearText() {
@@ -113,21 +120,21 @@ class _ChatScreenState extends State<ChatScreen> {
               !isSameUser
                   ? Row(
                       children: [
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //             color: Colors.grey.withOpacity(0.5),
-                        //             spreadRadius: 2,
-                        //             blurRadius: 5)
-                        //       ]),
-                        //   child: CircleAvatar(
-                        //     radius: 15,
-                        //     backgroundImage:
-                        //         AssetImage(message.sender.imageUrl),
-                        //   ),
-                        // ),
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 5)
+                              ]),
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundImage:
+                                AssetImage(message.sender.imageUrl),
+                          ),
+                        ),
                         SizedBox(
                           width: 10.0,
                         ),
@@ -202,35 +209,16 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: Color(0xFFF6F6f6),
         appBar: AppBar(
           centerTitle: true,
-          title: Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundImage: AssetImage(widget.user.imageUrl),
-              ),
-              SizedBox(
-                width: 30,
-              ),
-              RichText(
-                text: TextSpan(children: [
-                  TextSpan(
-                      text: widget.user.name,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
-                  TextSpan(text: '\n'),
-                  widget.user.isOnline
-                      ? TextSpan(
-                          text: 'Online',
-                          style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.w400))
-                      : TextSpan(
-                          text: 'Offline',
-                          style: TextStyle(
-                              fontSize: 11, fontWeight: FontWeight.w400)),
-                ]),
-              ),
-            ],
+          title: RichText(
+            text: TextSpan(children: [
+              TextSpan(
+                  text: widget.group.name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+              TextSpan(text: '\n'),
+              TextSpan(
+                  text: '${widget.group.member} Online',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w400))
+            ]),
           ),
           leading: IconButton(
             color: Colors.white,
