@@ -4,6 +4,7 @@ import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/group_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/screens/home_drawer.dart';
+import 'package:web_socket_channel/io.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -114,7 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => ChatScreen(user: chat.sender))),
+                              builder: (_) => ChatScreen(
+                                user: chat.sender,
+                                channel: IOWebSocketChannel.connect('wss://echo.websocket.org'),
+                                ))),
                       child: Container(
                           padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 15),

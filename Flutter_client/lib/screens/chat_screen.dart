@@ -1,11 +1,13 @@
 import 'package:chat_app/models/message_model.dart';
 import 'package:chat_app/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatScreen extends StatefulWidget {
   final User user;
+  final WebSocketChannel channel;
 
-  const ChatScreen({this.user});
+  const ChatScreen({this.user, this.channel});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -18,7 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
     fieldText.clear();
   }
 
-  _chatBubble(Message message, bool isMe, bool isSameUser) {
+  _chatBubble(String message, bool isMe, bool isSameUser) {
     if (isMe) {
       return Column(
         children: [
@@ -42,7 +44,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             blurRadius: 5)
                       ]),
                   child: Text(
-                    message.text,
+                    message,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -52,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          message.time,
+                          message,
                           style: TextStyle(fontSize: 12, color: Colors.black45),
                         ),
                         SizedBox(
@@ -105,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             blurRadius: 5)
                       ]),
                   child: Text(
-                    message.text,
+                    message,
                     style: TextStyle(color: Colors.black54),
                   ),
                 ),
@@ -132,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           width: 10.0,
                         ),
                         Text(
-                          message.time,
+                          message,
                           style: TextStyle(fontSize: 12, color: Colors.black45),
                         )
                       ],
@@ -177,14 +179,14 @@ class _ChatScreenState extends State<ChatScreen> {
               icon: Icon(Icons.send),
               onPressed: () {
                 if (_message != '') {
-                  Message message = Message(
-                      sender: currentUser,
-                      text: _message,
-                      time: '1:10 am',
-                      unread: true);
+                  // Message message = Message(
+                  //     sender: currentUser,
+                  //     text: _message,
+                  //     time: '1:10 am',
+                  //     unread: true);
                   clearText();
                   // messages.add(message);
-                  messages.insert(0, message);
+                  widget.channel.sink.add(_message);
                   setState(() {
                     _message = '';
                   });
@@ -193,6 +195,12 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.channel.sink.close();
+    super.dispose();
   }
 
   @override
@@ -245,16 +253,17 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Column(
           children: [
             Expanded(
-                child: ListView.builder(
-                    reverse: true,
-                    padding: EdgeInsets.all(10),
-                    itemCount: messages.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final message = messages[index];
-                      final isMe = message.sender.id == currentUser.id;
-                      final bool isSameUser = prevUserId == message.sender.id;
-                      prevUserId = message.sender.id;
-                      return _chatBubble(message, isMe, isSameUser);
+                child: StreamBuilder(
+                    // reverse: true,
+                    // padding: EdgeInsets.all(10),
+                    stream: widget.channel.stream,
+                    builder: (context, snapshot) {
+                      final message =
+                          snapshot.hasData ? '${snapshot.data}' : "No Message";
+                      // final isMe = message.sender.id == currentUser.id;
+                      // final bool isSameUser = prevUserId == message.sender.id;
+                      // prevUserId = message.sender.id;
+                      return _chatBubble(message, true, true);
                     })),
             Container(
               child: _sendMessageArea(),
