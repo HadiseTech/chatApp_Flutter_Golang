@@ -1,26 +1,35 @@
+import 'dart:convert';
+
 import 'package:chat_app/models/message_model.dart';
+import 'package:chat_app/models/msg_provider.dart';
 import 'package:chat_app/models/user_model.dart';
+import 'package:chat_app/screens/sendMessage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ChatScreen extends StatefulWidget {
+// class ChatScreen extends StatefulWidget {
+//   final User user;
+//   final WebSocketChannel channel;
+
+//   const ChatScreen({this.user, this.channel});
+
+//   @override
+//   _ChatScreenState createState() => _ChatScreenState();
+// }
+
+// class _ChatScreenState extends State<ChatScreen> {
+
+// }
+
+class ChatScreen extends StatelessWidget {
   final User user;
   final WebSocketChannel channel;
 
   const ChatScreen({this.user, this.channel});
 
-  @override
-  _ChatScreenState createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  final fieldText = TextEditingController();
-
-  void clearText() {
-    fieldText.clear();
-  }
-
-  _chatBubble(String message, bool isMe, bool isSameUser) {
+  _chatBubble(
+      Message message, bool isMe, bool isSameUser, BuildContext context) {
     if (isMe) {
       return Column(
         children: [
@@ -44,42 +53,42 @@ class _ChatScreenState extends State<ChatScreen> {
                             blurRadius: 5)
                       ]),
                   child: Text(
-                    message,
+                    message.text,
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
-              !isSameUser
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          message,
-                          style: TextStyle(fontSize: 12, color: Colors.black45),
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //             color: Colors.grey.withOpacity(0.5),
-                        //             spreadRadius: 2,
-                        //             blurRadius: 5)
-                        //       ]),
-                        //   child: CircleAvatar(
-                        //     radius: 15,
-                        //     backgroundImage:
-                        //         AssetImage(message.sender.imageUrl),
-                        //   ),
-                        // ),
-                      ],
-                    )
-                  : Container(
-                      child: null,
-                    )
+
+              // ? Row(
+              //     mainAxisAlignment: MainAxisAlignment.end,
+              //     children: [
+              //       Text(
+              //         message.text,
+              //         style: TextStyle(fontSize: 12, color: Colors.black45),
+              //       ),
+              //       SizedBox(
+              //         width: 10.0,
+              //       ),
+              //       // Container(
+              //       //   decoration: BoxDecoration(
+              //       //       shape: BoxShape.circle,
+              //       //       boxShadow: [
+              //       //         BoxShadow(
+              //       //             color: Colors.grey.withOpacity(0.5),
+              //       //             spreadRadius: 2,
+              //       //             blurRadius: 5)
+              //       //       ]),
+              //       //   child: CircleAvatar(
+              //       //     radius: 15,
+              //       //     backgroundImage:
+              //       //         AssetImage(message.sender.imageUrl),
+              //       //   ),
+              //       // ),
+              //     ],
+              //   )
+              // Container(
+              //     child: null,
+              //   )
             ],
           ),
         ],
@@ -107,41 +116,41 @@ class _ChatScreenState extends State<ChatScreen> {
                             blurRadius: 5)
                       ]),
                   child: Text(
-                    message,
+                    message.text,
                     style: TextStyle(color: Colors.black54),
                   ),
                 ),
               ),
-              !isSameUser
-                  ? Row(
-                      children: [
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //       shape: BoxShape.circle,
-                        //       boxShadow: [
-                        //         BoxShadow(
-                        //             color: Colors.grey.withOpacity(0.5),
-                        //             spreadRadius: 2,
-                        //             blurRadius: 5)
-                        //       ]),
-                        //   child: CircleAvatar(
-                        //     radius: 15,
-                        //     backgroundImage:
-                        //         AssetImage(message.sender.imageUrl),
-                        //   ),
-                        // ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Text(
-                          message,
-                          style: TextStyle(fontSize: 12, color: Colors.black45),
-                        )
-                      ],
-                    )
-                  : Container(
-                      child: null,
-                    )
+              // !isSameUser
+              //     ? Row(
+              //         children: [
+              // Container(
+              //   decoration: BoxDecoration(
+              //       shape: BoxShape.circle,
+              //       boxShadow: [
+              //         BoxShadow(
+              //             color: Colors.grey.withOpacity(0.5),
+              //             spreadRadius: 2,
+              //             blurRadius: 5)
+              //       ]),
+              //   child: CircleAvatar(
+              //     radius: 15,
+              //     backgroundImage:
+              //         AssetImage(message.sender.imageUrl),
+              //   ),
+              // ),
+              //       SizedBox(
+              //         width: 10.0,
+              //       ),
+              //       Text(
+              //         message.text,
+              //         style: TextStyle(fontSize: 12, color: Colors.black45),
+              //       )
+              //     ],
+              //   )
+              // : Container(
+              //     child: null,
+              //   )
             ],
           ),
         ],
@@ -149,62 +158,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  String _message = '';
-  _sendMessageArea() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      height: 70,
-      color: Colors.white,
-      child: Row(
-        children: [
-          IconButton(
-              icon: Icon(Icons.photo),
-              iconSize: 25,
-              color: Theme.of(context).primaryColor,
-              onPressed: () {}),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration.collapsed(hintText: 'Send a message'),
-              textCapitalization: TextCapitalization.sentences,
-              controller: fieldText,
-              onChanged: (value) {
-                setState(() {
-                  _message = value;
-                });
-              },
-            ),
-          ),
-          IconButton(
-              color: Theme.of(context).primaryColor,
-              icon: Icon(Icons.send),
-              onPressed: () {
-                if (_message != '') {
-                  // Message message = Message(
-                  //     sender: currentUser,
-                  //     text: _message,
-                  //     time: '1:10 am',
-                  //     unread: true);
-                  clearText();
-                  // messages.add(message);
-                  widget.channel.sink.add(_message);
-                  setState(() {
-                    _message = '';
-                  });
-                }
-              })
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
-    widget.channel.sink.close();
-    super.dispose();
+    channel.sink.close();
   }
 
   @override
   Widget build(BuildContext context) {
+    Message message;
     int prevUserId;
     return Scaffold(
         backgroundColor: Color(0xFFF6F6f6),
@@ -215,7 +176,7 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               CircleAvatar(
                 radius: 25,
-                backgroundImage: AssetImage(widget.user.imageUrl),
+                backgroundImage: AssetImage(user.imageUrl),
               ),
               SizedBox(
                 width: 30,
@@ -223,11 +184,11 @@ class _ChatScreenState extends State<ChatScreen> {
               RichText(
                 text: TextSpan(children: [
                   TextSpan(
-                      text: widget.user.name,
+                      text: user.name,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
                   TextSpan(text: '\n'),
-                  widget.user.isOnline
+                  user.isOnline
                       ? TextSpan(
                           text: 'Online',
                           style: TextStyle(
@@ -253,20 +214,45 @@ class _ChatScreenState extends State<ChatScreen> {
         body: Column(
           children: [
             Expanded(
-                child: StreamBuilder(
-                    // reverse: true,
-                    // padding: EdgeInsets.all(10),
-                    stream: widget.channel.stream,
-                    builder: (context, snapshot) {
-                      final message =
-                          snapshot.hasData ? '${snapshot.data}' : "No Message";
-                      // final isMe = message.sender.id == currentUser.id;
-                      // final bool isSameUser = prevUserId == message.sender.id;
-                      // prevUserId = message.sender.id;
-                      return _chatBubble(message, true, true);
-                    })),
+                child: Consumer<MessageModel>(
+                    builder: (context, model, _) => StreamBuilder(
+                        // reverse: true,
+                        // padding: EdgeInsets.all(10),
+                        stream: channel.stream,
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          // String message = '';
+                          if (snapshot.hasData) {
+                            Map<String, dynamic> jsonData =
+                                jsonDecode(snapshot.data);
+                            print("Kind ${jsonData["Type"]}");
+                            if (jsonData["Type"] != "end") {
+                              Message message = Message(
+                                  sender: thor,
+                                  text: jsonData["Message"],
+                                  time: '1:10 am',
+                                  unread: true);
+
+                              context.read<MessageModel>().add(message);
+                              // snapshot.data;
+                            }
+                          }
+                          return ListView.builder(
+                              itemCount: model.messages.length,
+                              itemBuilder: (context, idx) {
+                                final isMe = model.messages[idx].sender.id ==
+                                    currentUser.id;
+                                final bool isSameUser =
+                                    prevUserId == model.messages[idx].sender.id;
+                                prevUserId = model.messages[idx].sender.id;
+                                return _chatBubble(model.messages[idx], isMe,
+                                    isSameUser, context);
+                              });
+                        }))),
             Container(
-              child: _sendMessageArea(),
+              child: SendMessage(
+                channel: channel,
+              ),
             )
           ],
         ));

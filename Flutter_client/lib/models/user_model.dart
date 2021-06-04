@@ -63,3 +63,13 @@ final User thor = User(
   imageUrl: 'assets/images/thor.jpg',
   isOnline: false,
 );
+
+var user_images = {
+  0: 'assets/images/thor.jpg',
+  1: 'assets/images/spiderman.png',
+  2: 'assets/images/scarletwitch.jpg',
+  3: 'assets/images/hulk.jpg',
+  4: 'assets/images/captain.jpg',
+  5: 'assets/images/black_widow.jpg',
+  6: 'assets/images/black_panter.jpg'
+};

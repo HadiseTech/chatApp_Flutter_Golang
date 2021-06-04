@@ -1,12 +1,19 @@
+import 'dart:math';
+
 import 'package:chat_app/models/group_model.dart';
 import 'package:chat_app/models/message_model.dart';
+import 'package:chat_app/models/user_model.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/group_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/screens/home_drawer.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class HomeScreen extends StatefulWidget {
+  final username;
+  final WebSocketChannel channel;
+  HomeScreen({this.username,this.channel});
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -42,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.username);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -110,15 +118,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ListView.builder(
                   itemCount: _filtedChat.length,
                   itemBuilder: (BuildContext context, int index) {
+                    Random rand = Random();
+                    final image_source = rand.nextInt(7);
+                    print("image --- $image_source");
                     final Message chat = _filtedChat[index];
                     return GestureDetector(
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChatScreen(
-                                user: chat.sender,
-                                channel: IOWebSocketChannel.connect('wss://echo.websocket.org'),
-                                ))),
+                                    user: chat.sender,
+                                    channel: widget.channel,
+                                  ))),
                       child: Container(
                           padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 15),
@@ -154,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: CircleAvatar(
                                   radius: 35,
                                   backgroundImage:
-                                      AssetImage(chat.sender.imageUrl),
+                                      AssetImage(user_images[image_source]),
                                 ),
                               ),
                               Container(

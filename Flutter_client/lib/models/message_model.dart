@@ -7,8 +7,10 @@ class Message {
       time; // Would usually be type DateTime or Firebase Timestamp in production apps
   final String text;
   final bool unread;
+  final int id;
 
   Message({
+    this.id,
     this.sender,
     this.time,
     this.text,
@@ -51,7 +53,8 @@ List<Message> chats = [
   Message(
     sender: spider_man,
     time: '12:30 PM',
-    text: 'I\'m hitting gym bro. I\'m immune to mortal deseases. Are you coming?',
+    text:
+        'I\'m hitting gym bro. I\'m immune to mortal deseases. Are you coming?',
     unread: false,
   ),
   Message(
@@ -129,77 +132,7 @@ List<Message> messages_group_one = [
     time: '5:30 PM',
     text: 'Hey dude! Even dead I\'m the hero. Love you 3000 guys.',
     unread: true,
-  ),
-  Message(
-    sender: black_panter,
-    time: '5:30 PM',
-    text: 'Hey dude! Even dead I\'m the hero. Love you 3000 guys.',
-    unread: true,
-  ),
-  Message(
-    sender: black_widow,
-    time: '4:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    unread: true,
-  ),
-  Message(
-    sender: currentUser,
-    time: '3:30 PM',
-    text: 'WOW! this soul world is amazing, but miss you guys.',
-    unread: false,
-  ),
-  Message(
-    sender: captain_america,
-    time: '2:30 PM',
-    text: 'I\'m exposed now. Please help me to hide my identity.',
-    unread: true,
-  ),
-  Message(
-    sender: captain_america,
-    time: '1:30 PM',
-    text: 'HULK SMASH!!',
-    unread: false,
-  ),
-  Message(
-    sender: captain_america,
-    time: '12:30 PM',
-    text:
-        'I\'m hitting gym bro. I\'m immune to mortal deseases. Are you coming?',
-    unread: false,
-  ),
-  Message(
-    sender: hulk,
-    time: '11:30 AM',
-    text: 'My twins are giving me headache. Give me some time please.',
-    unread: false,
-  ),
-
-   Message(
-    sender: scarlet_witch,
-    time: '11:30 AM',
-    text: 'My twins are giving me headache. Give me some time please.',
-    unread: false,
-  ),
-
-   Message(
-    sender: spider_man,
-    time: '11:30 AM',
-    text: 'My twins are giving me headache. Give me some time please.',
-    unread: false,
-  ),
-   Message(
-    sender: thor,
-    time: '11:30 AM',
-    text: 'My twins are giving me headache. Give me some time please.',
-    unread: false,
-  ),
-
-  Message(
-    sender: currentUser,
-    time: '12:45 AM',
-    text: 'You\'re always special to me nick! But you know my struggle.',
-    unread: false,
-  ),
+  )
 ];
 
 // group message
@@ -247,7 +180,7 @@ List<Message> messages_group_two = [
     text: 'My twins are giving me headache. Give me some time please.',
     unread: false,
   ),
-   Message(
+  Message(
     sender: thor,
     time: '11:30 AM',
     text: 'My twins are giving me headache. Give me some time please.',
